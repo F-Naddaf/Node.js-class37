@@ -6,96 +6,47 @@ import app from '../app.js';
 const request = supertest(app);
 
 describe('/', () => {
-  it('should respond with a 200 status code', async () => {
+  it('should print message on html format', async () => {
     const response = await request.get('/');
     expect(response.statusCode).toBe(200);
-  });
-  it('should specify html in the content type header', async () => {
-    const response = await request.get('/');
-    expect(response.headers['content-type']).toEqual(
-      expect.stringContaining('html')
-    );
+    expect.stringContaining('html');
   });
 });
 
 describe('POST /weather', () => {
-  describe('write a city name', () => {
+  it('should give a city name', async () => {
     const body = {
       cityName: 'London',
     };
-    it('should respond with a 200 status code', async () => {
-      const response = await request.post('/weather').send(body);
-      expect(response.statusCode).toBe(200);
-    });
-    it('should specify json in the content type header', async () => {
-      const response = await request.post('/weather').send(body);
-      expect(response.headers['content-type']).toEqual(
-        expect.stringContaining('json', 'object', 'number')
-      );
-    });
-    
-  });
-});
-
-describe('POST /weather', () => {
-  describe('Give a city name', () => {
-    const body = {
+    const response = await request.post('/weather').send(body);
+    expect(response.statusCode).toBe(200);
+    expect.objectContaining({
       cityName: 'London',
-    };
-    it('should respond with a 200 status code', async () => {
-      const response = await request.post('/weather').send(body);
-      expect(response.statusCode).toBe(200);
-    });
-    it('should specify json in the content type header', async () => {
-      const response = await request.post('/weather').send(body);
-      expect(response.headers['content-type']).toEqual(
-        expect.stringContaining('json')
-      );
+      temperature: expect.any(Number),
     });
   });
-
-  describe('Not giving any city name', () => {
+  it('should respond with a 400 status if not enter any city name', async () => {
     const body = {
       cityName: '',
     };
-    it('should respond with a 400 status code', async () => {
-      const response = await request.post('/weather').send(body);
-      expect(response.statusCode).toBe(400);
-    });
-    it('should specify json in the content type header', async () => {
-      const response = await request.post('/weather').send(body);
-      expect(response.headers['content-type']).toEqual(
-        expect.stringContaining('json')
-      );
-    });
+    const response = await request.post('/weather').send(body);
+    expect(response.statusCode).toEqual(400);
+    expect.stringContaining('json');
   });
-
-  describe('Give a invalid city name', () => {
+  it('should respond with a 404 status if enter invalid city name', async () => {
     const body = {
       cityName: 'asdffs',
     };
-    it('should respond with a 404 status code', async () => {
-      const response = await request.post('/weather').send(body);
-      expect(response.statusCode).toBe(404);
-    });
-    it('should specify json in the content type header', async () => {
-      const response = await request.post('/weather').send(body);
-      expect(response.headers['content-type']).toEqual(
-        expect.stringContaining('json')
-      );
-    });
+    const response = await request.post('/weather').send(body);
+    expect(response.statusCode).toEqual(404);
+    expect.stringContaining('json');
   });
+});
 
-  describe('Server not response', () => {
-    it('should respond with a 500 status code', async () => {
-      const response = await request.post('/weather').send(body);
-      expect(response.statusCode).toBe(404);
-    });
-    it('should specify json in the content type header', async () => {
-      const response = await request.post('/weather').send(body);
-      expect(response.headers['content-type']).toEqual(
-        expect.stringContaining('json')
-      );
-    });
+describe('POST /weather', () => {
+  it('should respond with a 500 status if the server not response', async () => {
+    const response = await request.post('/weather');
+    expect(response.statusCode).toEqual(500);
+    expect.stringContaining('json');
   });
 });
