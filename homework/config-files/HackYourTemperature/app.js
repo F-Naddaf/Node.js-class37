@@ -17,15 +17,15 @@ app.post('/weather', async (req, res) => {
   const { cityName } = req.body;
   const api_url = `http://api.openweathermap.org/data/2.5/weather?q=${cityName}&APPID=${API_KEY}`;
   try {
-    const response = await fetch(api_url);
-    const json = await response.json();
     if (!cityName) {
       return res.status(400).json({
         weatherText: 'Please enter a valid city name.',
       });
     }
+    const response = await fetch(api_url);
+    const json = await response.json();
     if (json.cod === '404') {
-      res.status(404).json({ Message: 'City not found' });
+      res.status(404).json({ massage: 'City not found' });
     } else {
       res.status(200).json({
         weatherText: `The weather in ${json.name} is ${json.main.temp} degrees`,
